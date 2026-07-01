@@ -8,7 +8,7 @@
       <h1 class="h4 fw-bold mb-0">Municípios</h1>
       <p class="text-muted mb-0">Gerencie os municípios cadastrados.</p>
     </div>
-    <button class="btn btn-engaja btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateMunicipio">Novo município</button>
+    <button class="btn btn-engaja btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreateMunicipio">Novo Município</button>
   </div>
 
   @php
