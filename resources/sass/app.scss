@@ -1,0 +1,53 @@
+/* ===== Engaja Theme (Bootstrap 5) ===== */
+
+/* Fonte Montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+/* Paleta Engaja */
+$engaja-purple: #421944; // primária
+$engaja-blue:   #008BBC;
+$engaja-yellow: #FDB913;
+$engaja-pink:   #E62270;
+$engaja-green:  #2EB57D;
+
+$font-family-sans-serif: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif !default;
+$primary:   $engaja-purple;
+$secondary: $engaja-blue;
+$success:   $engaja-green;
+$warning:   $engaja-yellow;
+$danger:    $engaja-pink;
+$info:      $engaja-blue;
+
+$body-color: #1f1f1f;
+$body-bg: #ffffff;
+$border-radius: .6rem;
+$border-radius-lg: .8rem;
+
+@import "bootstrap/scss/bootstrap";
+
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    "engaja": $engaja-purple,
+    "blue":   $engaja-blue,
+    "yellow": $engaja-yellow,
+    "pink":   $engaja-pink,
+    "green":  $engaja-green
+  )
+);
+
+
+/* Custom utilities */
+.text-engaja     { color: $engaja-purple !important; }
+.bg-engaja       { background-color: $engaja-purple !important; }
+.btn-engaja {
+  @include button-variant($engaja-purple, $engaja-purple);
+}
+
+:root {
+  --engaja-purple: #{$engaja-purple};
+  --engaja-blue:   #{$engaja-blue};
+  --engaja-yellow: #{$engaja-yellow};
+  --engaja-pink:   #{$engaja-pink};
+  --engaja-green:  #{$engaja-green};
+}

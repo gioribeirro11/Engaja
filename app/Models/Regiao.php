@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Regiao extends Model
+{
+    use SoftDeletes;
+    protected $table = 'regiaos';
+    protected $fillable = ['nome'];
+
+    public function estados()
+    {
+        return $this->hasMany(Estado::class);
+    }
+}

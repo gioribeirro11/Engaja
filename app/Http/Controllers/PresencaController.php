@@ -1,0 +1,109 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Atividade;
+use App\Models\Inscricao;
+use App\Models\Participante;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class PresencaController extends Controller
+{
+    public function confirmarPresenca(Atividade $atividade)
+    {
+        $atividade->load(['municipios.estado']);
+        return view('atividades.confirmar-presenca', compact('atividade'));
+    }
+
+    public function store(Request $request, Atividade $atividade)
+    {
+        $request->validate([
+            'campo' => 'required|string',
+        ]);
+
+        $campo = trim(mb_strtolower($request->campo));
+
+        $usuario = User::whereRaw('LOWER(email) = ?', [$campo])->first();
+        $participante = Participante::where('cpf', $campo)
+            ->orWhere('telefone', $campo)
+            ->first();
+
+        if(!$usuario && $participante)
+        {
+            $usuario = User::find($participante->user_id);
+        }
+
+        //TODO redirecionar para a tela de cadastro de participante
+        if (!$usuario && !$participante) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Seus dados não foram encontrados no sistema. Solicitamos, por gentileza, que registre sua presença no formulário impresso.')
+                ->with('show_register_button', true);
+        }
+        if ($usuario && !$participante) {
+            $participante = Participante::where('user_id', $usuario->id)->first();
+        }
+        $evento = $atividade->evento;
+
+        $inscricao = Inscricao::withTrashed()
+            ->where('participante_id', $participante->id)
+            ->where('atividade_id', $atividade->id)
+            ->first();
+
+        if (!$inscricao) {
+            $inscricao = Inscricao::withTrashed()
+                ->where('participante_id', $participante->id)
+                ->where('evento_id', $evento->id)
+                ->whereNull('atividade_id')
+                ->first();
+        }
+
+        if ($inscricao) {
+            $inscricao->fill([
+                'evento_id'       => $evento->id,
+                'atividade_id'    => $atividade->id,
+                'participante_id' => $participante->id,
+                'ouvinte'         => $inscricao->atividade_id === $atividade->id ? $inscricao->ouvinte : true,
+            ]);
+            $inscricao->deleted_at = null;
+            $inscricao->save();
+        } else {
+            $inscricao = Inscricao::create([
+                'evento_id'       => $evento->id,
+                'atividade_id'    => $atividade->id,
+                'participante_id' => $participante->id,
+                'ouvinte'         => true,
+            ]);
+        }
+
+        $presenca = $atividade->presencas()->updateOrCreate(
+            ['inscricao_id' => $inscricao->id],
+            ['status' => 'presente']
+        );
+        if (is_null($presenca->avaliacao_respondida)) {
+            $presenca->avaliacao_respondida = false;
+            $presenca->save();
+        }
+        $dia = \Carbon\Carbon::parse($atividade->dia)
+            ->locale('pt_BR')
+            ->translatedFormat('l, d \\d\\e F \\d\\e Y');
+
+        return redirect()
+            ->route('presenca.confirmar', $atividade->id)
+            ->with([
+                'usuario_nome' => $usuario->name,
+                'evento_nome' => $evento->nome,
+                'atividade_nome' => $atividade->descricao,
+                'dia' => $dia,
+                'success-presenca' => 'Presença confirmada com sucesso!',
+                // 'status_presenca_label' => $inscricao->ouvinte ? 'Ouvinte' : 'Presença',
+                // 'artigo_status_presenca' => $inscricao->ouvinte ? 'sua participação como ouvinte' : 'sua presença',
+                'status_presenca_label' => 'Sua presença foi confirmada!',
+                'artigo_status_presenca' => 'sua presença',
+                'avaliacao_token' => $presenca->avaliacao_respondida ? null : encrypt($presenca->id),
+                'avaliacao_disponivel' => ! $presenca->avaliacao_respondida,
+            ]);
+    }
+}

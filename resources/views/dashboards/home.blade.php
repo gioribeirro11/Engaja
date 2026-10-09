@@ -1,0 +1,130 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container py-4">
+  <div class="card shadow-sm border-0 mb-4" style="background:#ecdeec;">
+    <div class="card-body d-flex flex-wrap justify-content-between align-items-start gap-3">
+      <div>
+        <p class="text-uppercase small mb-1" style="color:#421944;">Dashboards</p>
+        <h1 class="h4 fw-bold mb-1" style="color:#421944;">Escolha o painel</h1>
+      </div>
+      <div class="d-flex flex-wrap gap-2 align-self-center">
+        <a class="btn btn-outline-secondary" href="{{ route('dashboards.bi') }}">
+          BI Educacional
+        </a>
+        <a class="btn btn-outline-primary" href="{{ route('dashboards.avaliacoes') }}">
+          Respostas de formulários
+        </a>
+        <a class="btn btn-primary" href="{{ route('dashboards.presencas') }}">
+          Presenças e inscrições
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-4">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body d-flex">
+          <div class="d-flex flex-column w-100">
+              <p class="text-uppercase text-primary small fw-semibold mb-1">Respostas</p>
+              <h2 class="h5 fw-bold">Painel de formulários</h2>
+              <p class="text-muted mb-3">
+                Acompanhe médias, distribuições e respostas abertas com gráficos dinâmicos.
+                Filtre por modelo, ação pedagógica ou período.
+              </p>
+              <a href="{{ route('dashboards.avaliacoes') }}" class="btn btn-primary mt-auto align-self-start">
+                Abrir dashboard de respostas
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body d-flex">
+          <div class="d-flex flex-column w-100">
+              <p class="text-uppercase text-success small fw-semibold mb-1">Presença</p>
+              <h2 class="h5 fw-bold">Painel de presenças e inscrições</h2>
+              <p class="text-muted mb-3">
+                Acompanhe presenças e inscritos por ação pedagógica,
+                com filtros, expansão de linhas e exportação em PDF.
+              </p>
+              <a href="{{ route('dashboards.presencas') }}" class="btn btn-success mt-auto align-self-start">
+                Abrir dashboard de presenças
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body d-flex">
+          <div class="d-flex flex-column w-100">
+              <p class="text-uppercase small fw-semibold mb-1" style="color:#421944;">BI</p>
+              <h2 class="h5 fw-bold">Painel de indicadores educacionais</h2>
+              <p class="text-muted mb-3">
+                Acompanhe rankings e recortes por município para apoiar análises e decisões.
+              </p>
+              <a href="{{ route('dashboards.bi') }}" class="btn btn-secondary mt-auto align-self-start">
+                Abrir dashboard BI
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white border-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-uppercase small text-muted mb-0">Modelos de formulário</p>
+              <h3 class="h6 fw-bold mb-0">Últimos utilizados</h3>
+            </div>
+          </div>
+        </div>
+        <div class="list-group list-group-flush">
+          @forelse($templatesDisponiveis as $template)
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold">{{ $template->nome }}</div>
+            </div>
+            <a class="btn btn-sm btn-outline-primary" href="{{ route('dashboards.avaliacoes', ['template_id' => $template->id]) }}">
+              Ver respostas
+            </a>
+          </div>
+          @empty
+          <div class="list-group-item text-muted">Nenhum modelo cadastrado ainda.</div>
+          @endforelse
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white border-0">
+          <p class="text-uppercase small text-muted mb-0">Ações pedagógicas recentes</p>
+          <h3 class="h6 fw-bold mb-0">O que recebeu inscrições</h3>
+        </div>
+        <div class="card-body">
+          <div class="vstack gap-3">
+            @forelse($eventosRecentes as $evento)
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="fw-semibold">{{ $evento->nome }}</div>
+                <small class="text-muted">Criado em {{ optional($evento->created_at)->format('d/m/Y') }}</small>
+              </div>
+              <a href="{{ route('eventos.show', $evento) }}" class="btn btn-sm btn-outline-secondary">Ver ação</a>
+            </div>
+            @empty
+            <div class="text-muted">Nenhuma ação pedagógica registrada.</div>
+            @endforelse
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@endsection

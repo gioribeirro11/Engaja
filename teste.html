@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste do dropdown Exportar</title>
+<style>
+body { font-family: Montserrat, system-ui, sans-serif; padding: 40px; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.btn {
+  font: 600 14px/1 Montserrat, system-ui, sans-serif;
+  border-radius: 999px; padding: 10px 14px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid; text-decoration: none;
+}
+.btn-lilac  { background: #f0e4f7; border-color: #d9b9ea; color: #4a1d57; }
+.btn-export { background: #e6f8ee; border-color: #8fdcb0; color: #16693a; }
+.btn:focus-visible, .menu a:focus-visible { outline: 2px solid #7b2fa8; outline-offset: 2px; }
+
+.dd { position: relative; }
+.chev { display: inline-block; transition: transform .15s; }
+[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+.menu {
+  position: absolute; right: 0; top: calc(100% + 6px);
+  min-width: 210px; padding: 6px; z-index: 20;
+  background: #fff; border: 1px solid #d9dce3; border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(40, 20, 60, .16);
+}
+.menu[hidden] { display: none; }
+.menu a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px;
+  color: #1d1b22; text-decoration: none; font: 500 14px Montserrat, system-ui, sans-serif;
+}
+.menu a:hover, .menu a:focus-visible { background: #f3ecf8; }
+</style>
+</head>
+<body>
+
+<div class="actions">
+  <span>1 relatório(s)</span>
+  <button type="button" class="btn btn-lilac">Ver respostas</button>
+
+  <div class="dd">
+    <button type="button" class="btn btn-export"
+            aria-haspopup="menu" aria-expanded="false" aria-controls="menu-exportar">
+      Exportar <span class="chev" aria-hidden="true">▾</span>
+    </button>
+
+    <div class="menu" id="menu-exportar" role="menu" hidden>
+      <a role="menuitem" href="#pdf">PDF Geral</a>
+      <a role="menuitem" href="#word">Word Geral</a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.dd').forEach(dd => {
+  const botao = dd.querySelector('.btn-export');
+  const menu  = dd.querySelector('.menu');
+
+  const abrir = (valor) => {
+    menu.hidden = !valor;
+    botao.setAttribute('aria-expanded', valor);
+  };
+
+  botao.addEventListener('click', () => abrir(menu.hidden));
+
+  document.addEventListener('click', e => {
+    if (!dd.contains(e.target)) abrir(false);
+  });
+
+  dd.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { abrir(false); botao.focus(); }
+  });
+});
+</script>
+
+</body>
+</html>
