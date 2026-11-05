@@ -281,6 +281,36 @@ class AvaliacaoAtividadeController extends Controller
      */
     public function baixarTodosPorAtividade(Atividade $atividade)
     {
+        $dados = $this->montarDadosConsolidados($atividade);
+
+        $nomeArquivo = 'relatorios-consolidado-'.Str::slug($atividade->descricao ?? 'momento').'.pdf';
+
+        return Pdf::view('avaliacao-atividade.pdf-consolidado', $dados)
+            ->format('a4')
+            ->withAlfaEjaBrand()
+            ->download($nomeArquivo);
+    }
+
+    /**
+     * Gera documento Word consolidado com todos os relatórios de um momento (atividade).
+     */
+    public function baixarTodosPorAtividadeWord(Atividade $atividade)
+    {
+        $dados = $this->montarDadosConsolidados($atividade);
+
+        $nomeArquivo = 'relatorios-consolidado-'.Str::slug($atividade->descricao ?? 'momento').'.doc';
+
+        return response(view('avaliacao-atividade.word-consolidado', $dados)->render(), 200, [
+            'Content-Type' => 'application/msword; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$nomeArquivo.'"',
+        ]);
+    }
+
+    /**
+     * Reúne os dados consolidados de um momento, compartilhados pelas exportações (PDF e Word).
+     */
+    private function montarDadosConsolidados(Atividade $atividade): array
+    {
         abort_unless(
             auth()->user()?->hasAnyRole(self::REPORT_EDIT_ROLES),
             403,
@@ -323,18 +353,13 @@ class AvaliacaoAtividadeController extends Controller
             ];
         })->values();
 
-        $nomeArquivo = 'relatorios-consolidado-'.Str::slug($atividade->descricao ?? 'momento').'.pdf';
-
-        return Pdf::view('avaliacao-atividade.pdf-consolidado', [
+        return [
             'atividade' => $atividade,
             'relatorios' => $relatorios,
             'resumoPublico' => $resumoPublico,
             'camposPerguntas' => self::REPORT_QUESTION_FIELDS,
             'respostasPorPergunta' => $respostasPorPergunta,
-        ])
-            ->format('a4')
-            ->withAlfaEjaBrand()
-            ->download($nomeArquivo);
+        ];
     }
 
     private function authorizeRelatorio(AvaliacaoAtividade $relatorio): void

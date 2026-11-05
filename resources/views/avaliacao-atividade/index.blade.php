@@ -23,26 +23,25 @@
             border: 1px solid #d9b7e2;
             font-weight: 600;
         }
-        .btn-pdf-geral {
-            border: 1px solid #86efac;
-            color: #166534;
-            background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%);
+        .btn-exportar {
+            border: 1px solid #421944;
+            color: #421944;
+            background: #fff;
             font-weight: 600;
             border-radius: 999px;
             padding: .38rem .85rem;
             line-height: 1.1;
-            box-shadow: 0 1px 2px rgba(22, 101, 52, 0.10);
             transition: all .15s ease-in-out;
         }
-        .btn-pdf-geral:hover {
-            background: linear-gradient(180deg, #dcfce7 0%, #bbf7d0 100%);
-            color: #14532d;
-            border-color: #4ade80;
-            box-shadow: 0 2px 6px rgba(22, 101, 52, 0.18);
-            transform: translateY(-1px);
+        .btn-exportar:hover,
+        .btn-exportar:focus,
+        .btn-exportar.show {
+            background: #f3e8f8;
+            color: #421944;
+            border-color: #421944;
         }
-        .btn-pdf-geral:focus-visible {
-            outline: 2px solid #16a34a;
+        .btn-exportar:focus-visible {
+            outline: 2px solid #421944;
             outline-offset: 1px;
         }
     </style>
@@ -145,11 +144,28 @@
                         </span>
                     </button>
                     @if($atividade && auth()->user()?->hasAnyRole(['administrador', 'gerente', 'eq_pedagogica']))
-                    <a href="{{ route('avaliacao-atividade.download-all', $atividade) }}"
-                       class="btn btn-sm btn-pdf-geral text-nowrap"
-                       title="Baixar PDF consolidado com todos os relatórios deste momento">
-                        📄 PDF Geral
-                    </a>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-exportar dropdown-toggle text-nowrap"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                data-bs-boundary="viewport"
+                                aria-expanded="false"
+                                title="Exportar os relatórios deste momento">
+                            <i class="bi bi-download me-1" aria-hidden="true"></i> Exportar
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('avaliacao-atividade.download-all', $atividade) }}">
+                                    <i class="bi bi-file-earmark-pdf me-2 text-danger" aria-hidden="true"></i>PDF Geral
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('avaliacao-atividade.download-all-word', $atividade) }}">
+                                    <i class="bi bi-file-earmark-word me-2 text-primary" aria-hidden="true"></i>Word Geral
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                     @endif
                     </div>
 
